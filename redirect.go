@@ -6,7 +6,7 @@ import (
 )
 
 // NonWWWRedirect redirects www to non-www
-func NonWWWRedirect() func(http.Handler) http.Handler {
+func NonWWWRedirect() Middleware {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			host := strings.TrimPrefix(r.Host, prefixWWW)
