@@ -1,2 +1,3 @@
 # middleware
-Acoshift's middleware collection
+
+Acoshift's Middleware standard
