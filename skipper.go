@@ -28,3 +28,15 @@ func SkipHTTPS(r *http.Request) bool {
 	}
 	return true
 }
+
+// SkipIf skips if b is true
+func SkipIf(b bool) Skipper {
+	return func(*http.Request) bool {
+		return b
+	}
+}
+
+// SkipUnless skips if b is false
+func SkipUnless(b bool) Skipper {
+	return SkipIf(!b)
+}
