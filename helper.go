@@ -2,8 +2,6 @@ package middleware
 
 import (
 	"net/http"
-
-	"github.com/acoshift/header"
 )
 
 const (
@@ -14,7 +12,7 @@ func isTLS(r *http.Request) bool {
 	if r.TLS != nil {
 		return true
 	}
-	if r.Header.Get(header.XForwardedProto) == "https" {
+	if r.Header.Get("X-Forwarded-Proto") == "https" {
 		return true
 	}
 	return false
