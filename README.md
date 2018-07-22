@@ -70,3 +70,24 @@ middleware.NonWWWRedirect()
 ```go
 middleware.WWWRedirect()
 ```
+
+## CORS
+
+```go
+middleware.CORS(middleware.DefaultCORS)
+```
+
+```go
+middleware.CORS(CORSConfig{
+    AllowOrigins: []string{"example.com"},
+    AllowMethods: []string{
+        http.MethodGet,
+        http.MethodPost,
+    },
+    AllowHeaders: []string{
+        "Content-Type",
+    },
+    AllowCredentials: true,
+    MaxAge: time.Hour,
+})
+```
