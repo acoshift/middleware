@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"net/textproto"
 )
 
 const (
@@ -23,4 +24,14 @@ func scheme(r *http.Request) string {
 		return "https"
 	}
 	return "http"
+}
+
+func addHeaderIfNotExists(h http.Header, key, value string) {
+	key = textproto.CanonicalMIMEHeaderKey(key)
+	for _, v := range h[key] {
+		if v == value {
+			return
+		}
+	}
+	h.Add(key, value)
 }

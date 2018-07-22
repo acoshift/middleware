@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"bufio"
+	"compress/flate"
 	"compress/gzip"
 	"io"
 	"io/ioutil"
@@ -23,7 +24,11 @@ type CompressConfig struct {
 	MinLength int    // skip if Content-Length less than given value
 }
 
-const defaultTypes = "text/plain text/html text/css text/xml text/javascript application/x-javascript application/xml"
+const (
+	defaultCompressVary      = true
+	defaultCompressTypes     = "text/plain text/html text/css text/xml text/javascript application/x-javascript application/xml"
+	defaultCompressMinLength = 860
+)
 
 // pre-defined compressors
 var (
@@ -37,9 +42,24 @@ var (
 			return g
 		},
 		Encoding:  "gzip",
-		Vary:      true,
-		Types:     defaultTypes,
-		MinLength: 860,
+		Vary:      defaultCompressVary,
+		Types:     defaultCompressTypes,
+		MinLength: defaultCompressMinLength,
+	}
+
+	DeflateCompressor = CompressConfig{
+		Skipper: DefaultSkipper,
+		New: func() Compressor {
+			g, err := flate.NewWriter(ioutil.Discard, flate.DefaultCompression)
+			if err != nil {
+				panic(err)
+			}
+			return g
+		},
+		Encoding:  "deflate",
+		Vary:      defaultCompressVary,
+		Types:     defaultCompressTypes,
+		MinLength: defaultCompressMinLength,
 	}
 )
 
@@ -89,7 +109,7 @@ func Compress(config CompressConfig) Middleware {
 			}
 
 			if config.Vary {
-				hh.Add("Vary", "Accept-Encoding")
+				addHeaderIfNotExists(hh, "Vary", "Accept-Encoding")
 			}
 
 			gw := &compressWriter{
