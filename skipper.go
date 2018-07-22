@@ -15,18 +15,12 @@ func DefaultSkipper(*http.Request) bool {
 
 // SkipHTTP skips http request
 func SkipHTTP(r *http.Request) bool {
-	if isTLS(r) {
-		return false
-	}
-	return true
+	return !isTLS(r)
 }
 
 // SkipHTTPS skips https request
 func SkipHTTPS(r *http.Request) bool {
-	if !isTLS(r) {
-		return false
-	}
-	return true
+	return isTLS(r)
 }
 
 // SkipIf skips if b is true

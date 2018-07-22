@@ -57,6 +57,10 @@ middleware.Compress(middleware.CompressConfig{
 middleware.Compress(middleware.GzipCompressor)
 ```
 
+```go
+middleware.Compress(middleware.DeflateCompressor)
+```
+
 ## Redirector
 
 ```go
