@@ -5,10 +5,6 @@ import (
 	"net/textproto"
 )
 
-const (
-	prefixWWW = "www."
-)
-
 func isTLS(r *http.Request) bool {
 	if r.TLS != nil {
 		return true
