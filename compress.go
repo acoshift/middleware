@@ -24,10 +24,11 @@ type CompressConfig struct {
 	MinLength int    // skip if Content-Length less than given value
 }
 
+// default values
 const (
-	defaultCompressVary      = true
-	defaultCompressTypes     = "text/plain text/html text/css text/xml text/javascript application/x-javascript application/xml"
-	defaultCompressMinLength = 860
+	DefaultCompressVary      = true
+	DefaultCompressTypes     = "text/plain text/html text/css text/xml text/javascript application/x-javascript application/xml"
+	DefaultCompressMinLength = 860
 )
 
 // pre-defined compressors
@@ -42,9 +43,9 @@ var (
 			return g
 		},
 		Encoding:  "gzip",
-		Vary:      defaultCompressVary,
-		Types:     defaultCompressTypes,
-		MinLength: defaultCompressMinLength,
+		Vary:      DefaultCompressVary,
+		Types:     DefaultCompressTypes,
+		MinLength: DefaultCompressMinLength,
 	}
 
 	DeflateCompressor = CompressConfig{
@@ -57,9 +58,9 @@ var (
 			return g
 		},
 		Encoding:  "deflate",
-		Vary:      defaultCompressVary,
-		Types:     defaultCompressTypes,
-		MinLength: defaultCompressMinLength,
+		Vary:      DefaultCompressVary,
+		Types:     DefaultCompressTypes,
+		MinLength: DefaultCompressMinLength,
 	}
 )
 

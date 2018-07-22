@@ -1,23 +1,23 @@
-// +build cgo
-
-package middleware
+package brotli
 
 import (
 	"io"
 
 	"github.com/google/brotli/go/cbrotli"
+
+	"github.com/acoshift/middleware"
 )
 
 // BrCompressor is the brotli compressor for compress middleware
-var BrCompressor = CompressConfig{
-	Skipper: DefaultSkipper,
-	New: func() Compressor {
+var BrCompressor = middleware.CompressConfig{
+	Skipper: middleware.DefaultSkipper,
+	New: func() middleware.Compressor {
 		return &brWriter{quality: 4}
 	},
 	Encoding:  "br",
-	Vary:      defaultCompressVary,
-	Types:     defaultCompressTypes,
-	MinLength: defaultCompressMinLength,
+	Vary:      middleware.DefaultCompressVary,
+	Types:     middleware.DefaultCompressTypes,
+	MinLength: middleware.DefaultCompressMinLength,
 }
 
 type brWriter struct {
