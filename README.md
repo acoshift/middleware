@@ -141,6 +141,8 @@ RUN apk --no-cache add cmake
 RUN git clone https://github.com/google/brotli && cd brotli && cmake . && make install && cd .. && rm -rf brotli
 ```
 
+and add `-tags=cbrotli` when using `go build`
+
 ### Compress Order
 
 Unlike normal middleware, compressor have to peek on response header.
