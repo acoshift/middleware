@@ -12,7 +12,7 @@ type Middleware func(h http.Handler) http.Handler
 
 ```go
 func say(text string) Middleware {
-    return http.Handler(h http.Handler) http.Handler {
+    return func(h http.Handler) http.Handler {
         return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
             fmt.Println(text)
             h.ServeHTTP(w, r)
