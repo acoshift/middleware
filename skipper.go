@@ -13,6 +13,11 @@ func DefaultSkipper(*http.Request) bool {
 	return false
 }
 
+// AlwaysSkip always return true
+func AlwaysSkip(*http.Request) bool {
+	return true
+}
+
 // SkipHTTP skips http request
 func SkipHTTP(r *http.Request) bool {
 	return !isTLS(r)
