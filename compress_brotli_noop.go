@@ -1,4 +1,4 @@
-// +build !cgo,!cbrotli
+// +build !cbrotli
 
 package middleware
 
