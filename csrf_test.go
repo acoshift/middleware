@@ -19,19 +19,64 @@ func TestCSRF(t *testing.T) {
 			Origins: []string{"http://example.com"},
 		})
 
-		assert.Equal(t, 200, testOrigin(m, "http://example.com"))
-		assert.Equal(t, 403, testOrigin(m, "https://example.com"))
-		assert.Equal(t, 403, testOrigin(m, "example.com"))
-		assert.Equal(t, 403, testOrigin(m, "hacker.com"))
-		assert.Equal(t, 403, testOrigin(m, "http://hacker.com"))
-		assert.Equal(t, 403, testOrigin(m, "https://hacker.com"))
+		assert.Equal(t, 200, test(m, "", ""))
 
-		assert.Equal(t, 200, testReferer(m, "http://example.com/"))
-		assert.Equal(t, 403, testReferer(m, "https://example.com/"))
-		assert.Equal(t, 403, testReferer(m, "example.com/"))
-		assert.Equal(t, 403, testReferer(m, "hacker.com/"))
-		assert.Equal(t, 403, testReferer(m, "http://hacker.com/"))
-		assert.Equal(t, 403, testReferer(m, "https://hacker.com/"))
+		assert.Equal(t, 200, test(m, "http://example.com", ""))
+		assert.Equal(t, 200, test(m, "http://example.com", "http://example.com/"))
+		assert.Equal(t, 403, test(m, "http://example.com", "http://example.com"))
+		assert.Equal(t, 403, test(m, "http://example.com", "https://example.com"))
+		assert.Equal(t, 403, test(m, "http://example.com", "https://example.com/"))
+		assert.Equal(t, 403, test(m, "https://example.com", ""))
+		assert.Equal(t, 403, test(m, "https://example.com", "http://example.com/"))
+		assert.Equal(t, 403, test(m, "https://example.com", "http://example.com"))
+		assert.Equal(t, 403, test(m, "example.com", ""))
+		assert.Equal(t, 403, test(m, "hacker.com", ""))
+		assert.Equal(t, 403, test(m, "http://hacker.com", ""))
+		assert.Equal(t, 403, test(m, "http://hacker.com", "http://hacker.com/"))
+		assert.Equal(t, 403, test(m, "http://hacker.com", "http://example.com/"))
+		assert.Equal(t, 403, test(m, "https://hacker.com", ""))
+		assert.Equal(t, 403, test(m, "https://hacker.com", "https://hacker.com/"))
+		assert.Equal(t, 403, test(m, "https://hacker.com", "http://example.com/"))
+
+		assert.Equal(t, 200, test(m, "", "http://example.com/"))
+		assert.Equal(t, 403, test(m, "", "https://example.com/"))
+		assert.Equal(t, 403, test(m, "", "example.com/"))
+		assert.Equal(t, 403, test(m, "", "hacker.com/"))
+		assert.Equal(t, 403, test(m, "", "http://hacker.com/"))
+		assert.Equal(t, 403, test(m, "", "https://hacker.com/"))
+	})
+
+	t.Run("Force", func(t *testing.T) {
+		m := middleware.CSRF(middleware.CSRFConfig{
+			Origins: []string{"http://example.com"},
+			Force:   true,
+		})
+
+		assert.Equal(t, 403, test(m, "", ""))
+
+		assert.Equal(t, 403, test(m, "http://example.com", ""))
+		assert.Equal(t, 403, test(m, "http://example.com", "http://example.com"))
+		assert.Equal(t, 200, test(m, "http://example.com", "http://example.com/"))
+		assert.Equal(t, 200, test(m, "http://example.com", "http://example.com/page1"))
+		assert.Equal(t, 200, test(m, "http://example.com", "http://example.com/page1/page2"))
+		assert.Equal(t, 403, test(m, "http://example.com", "https://example.com/"))
+		assert.Equal(t, 403, test(m, "http://example.com", "https://example.com/page1"))
+		assert.Equal(t, 403, test(m, "http://example.com", "https://example.com/page1/page2"))
+		assert.Equal(t, 403, test(m, "https://example.com", ""))
+		assert.Equal(t, 403, test(m, "https://example.com", ""))
+		assert.Equal(t, 403, test(m, "example.com", ""))
+		assert.Equal(t, 403, test(m, "hacker.com", ""))
+		assert.Equal(t, 403, test(m, "http://hacker.com", ""))
+		assert.Equal(t, 403, test(m, "http://hacker.com", "http://hacker.com"))
+		assert.Equal(t, 403, test(m, "http://hacker.com", "http://example.com/"))
+		assert.Equal(t, 403, test(m, "https://hacker.com", ""))
+
+		assert.Equal(t, 403, test(m, "", "http://example.com/"))
+		assert.Equal(t, 403, test(m, "", "https://example.com/"))
+		assert.Equal(t, 403, test(m, "", "example.com/"))
+		assert.Equal(t, 403, test(m, "", "hacker.com/"))
+		assert.Equal(t, 403, test(m, "", "http://hacker.com/"))
+		assert.Equal(t, 403, test(m, "", "https://hacker.com/"))
 	})
 
 	t.Run("IgnoreProto", func(t *testing.T) {
@@ -40,19 +85,19 @@ func TestCSRF(t *testing.T) {
 			IgnoreProto: true,
 		})
 
-		assert.Equal(t, 200, testOrigin(m, "http://example.com"))
-		assert.Equal(t, 200, testOrigin(m, "https://example.com"))
-		assert.Equal(t, 403, testOrigin(m, "example.com"))
-		assert.Equal(t, 403, testOrigin(m, "hacker.com"))
-		assert.Equal(t, 403, testOrigin(m, "http://hacker.com"))
-		assert.Equal(t, 403, testOrigin(m, "https://hacker.com"))
+		assert.Equal(t, 200, test(m, "http://example.com", ""))
+		assert.Equal(t, 200, test(m, "https://example.com", ""))
+		assert.Equal(t, 403, test(m, "example.com", ""))
+		assert.Equal(t, 403, test(m, "hacker.com", ""))
+		assert.Equal(t, 403, test(m, "http://hacker.com", ""))
+		assert.Equal(t, 403, test(m, "https://hacker.com", ""))
 
-		assert.Equal(t, 200, testReferer(m, "http://example.com/"))
-		assert.Equal(t, 200, testReferer(m, "https://example.com/"))
-		assert.Equal(t, 403, testReferer(m, "example.com/"))
-		assert.Equal(t, 403, testReferer(m, "hacker.com/"))
-		assert.Equal(t, 403, testReferer(m, "http://hacker.com/"))
-		assert.Equal(t, 403, testReferer(m, "https://hacker.com/"))
+		assert.Equal(t, 200, test(m, "", "http://example.com/"))
+		assert.Equal(t, 200, test(m, "", "https://example.com/"))
+		assert.Equal(t, 403, test(m, "", "example.com/"))
+		assert.Equal(t, 403, test(m, "", "hacker.com/"))
+		assert.Equal(t, 403, test(m, "", "http://hacker.com/"))
+		assert.Equal(t, 403, test(m, "", "https://hacker.com/"))
 	})
 
 	t.Run("IgnoreProto2", func(t *testing.T) {
@@ -61,34 +106,29 @@ func TestCSRF(t *testing.T) {
 			IgnoreProto: true,
 		})
 
-		assert.Equal(t, 200, testOrigin(m, "http://example.com"))
-		assert.Equal(t, 200, testOrigin(m, "https://example.com"))
-		assert.Equal(t, 403, testOrigin(m, "example.com"))
-		assert.Equal(t, 403, testOrigin(m, "hacker.com"))
-		assert.Equal(t, 403, testOrigin(m, "http://hacker.com"))
-		assert.Equal(t, 403, testOrigin(m, "https://hacker.com"))
+		assert.Equal(t, 200, test(m, "http://example.com", ""))
+		assert.Equal(t, 200, test(m, "https://example.com", ""))
+		assert.Equal(t, 403, test(m, "example.com", ""))
+		assert.Equal(t, 403, test(m, "hacker.com", ""))
+		assert.Equal(t, 403, test(m, "http://hacker.com", ""))
+		assert.Equal(t, 403, test(m, "https://hacker.com", ""))
 
-		assert.Equal(t, 200, testReferer(m, "http://example.com/"))
-		assert.Equal(t, 200, testReferer(m, "https://example.com/"))
-		assert.Equal(t, 403, testReferer(m, "example.com/"))
-		assert.Equal(t, 403, testReferer(m, "hacker.com/"))
-		assert.Equal(t, 403, testReferer(m, "http://hacker.com/"))
-		assert.Equal(t, 403, testReferer(m, "https://hacker.com/"))
+		assert.Equal(t, 200, test(m, "", "http://example.com/"))
+		assert.Equal(t, 200, test(m, "", "https://example.com/"))
+		assert.Equal(t, 403, test(m, "", "example.com/"))
+		assert.Equal(t, 403, test(m, "", "hacker.com/"))
+		assert.Equal(t, 403, test(m, "", "http://hacker.com/"))
+		assert.Equal(t, 403, test(m, "", "https://hacker.com/"))
 	})
+
 }
 
-func testOrigin(m middleware.Middleware, origin string) int {
+func test(m middleware.Middleware, origin, referer string) int {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodPost, "/", nil)
 	r.Header.Set("Origin", origin)
-	m(h).ServeHTTP(w, r)
-	return w.Code
-}
-
-func testReferer(m middleware.Middleware, referer string) int {
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodPost, "/", nil)
 	r.Header.Set("Referer", referer)
+	r.Header.Set("X-Forwarded-Proto", "https")
 	m(h).ServeHTTP(w, r)
 	return w.Code
 }
